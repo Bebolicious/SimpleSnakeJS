@@ -1,0 +1,104 @@
+<canvas id="gc" width="400" height="400"></canvas>
+<script>
+  window.onload = function() {
+    canv = document.getElementById("gc");
+    ctx = canv.getContext("2d");
+    document.addEventListener("keydown", keyPush);
+    setInterval(game, 700 / 15);
+  };
+  plapyerx = plapyery = 10;
+  grid = tc = 20;
+  apx = apy = 15;
+  xvel = yvel = 0;
+  trail = [];
+  tail = 5;
+  score = 0;
+  mySound;
+
+  // Main Game function
+  function game() {
+    mySound = new sound(
+      "sound goes here"
+    );
+    let gameoverCount = 0;
+    plapyerx += xvel;
+    plapyery += yvel;
+    if (plapyerx < 0) {
+      plapyerx = tc - 1;
+    }
+    if (plapyerx > tc - 1) {
+      plapyerx = 0;
+    }
+    if (plapyery < 0) {
+      plapyery = tc - 1;
+    }
+    if (plapyery > tc - 1) {
+      plapyery = 0;
+    }
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canv.width, canv.height);
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText("Score: " + score, 5, 20);
+    ctx.fillStyle = "green";
+
+    // Snake hits himself
+    for (var i = 0; i < trail.length; i++) {
+      ctx.fillRect(trail[i].x * grid, trail[i].y * grid, grid - 2, grid - 2);
+      if (trail[i].x == plapyerx && trail[i].y == plapyery) {
+        score = 0;
+        tail = 5;
+      }
+    }
+    trail.push({ x: plapyerx, y: plapyery });
+    while (trail.length > tail) {
+      trail.shift();
+    }
+    // Snake eats apple
+    if (apx == plapyerx && apy == plapyery) {
+      mySound.play();
+      score++;
+      tail++;
+      apx = Math.floor(Math.random() * tc);
+      apy = Math.floor(Math.random() * tc);
+    }
+    ctx.fillStyle = "red";
+    ctx.fillRect(apx * grid, apy * grid, grid - 2, grid - 2);
+  }
+  // Arrowkey switch
+  function keyPush(evt) {
+    switch (evt.keyCode) {
+      case 37:
+        xvel = -1;
+        yvel = 0;
+        break;
+      case 38:
+        xvel = 0;
+        yvel = -1;
+        break;
+      case 39:
+        xvel = 1;
+        yvel = 0;
+        break;
+      case 40:
+        xvel = 0;
+        yvel = 1;
+        break;
+    }
+  }
+  // Soundboard
+  function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function() {
+      this.sound.play();
+    };
+    this.stop = function() {
+      this.sound.pause();
+    };
+  }
+</script>
